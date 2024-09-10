@@ -27,42 +27,42 @@ async function sendTelegramNotification(message) {
 }
 
 async function trackDeposits() {
-  try {
-      const block = await getLatestBlock();
-      console.log("Latest block fetched: ", block);
+    try {
+        const block = await getLatestBlock();
+        console.log("Latest block fetched: ", block);
 
-      const transactions = block.transactions;
-      console.log("Block transactions: ", transactions);
+        const transactions = block.transactions;
+        console.log("Block transactions: ", transactions);
 
-      if (!transactions || transactions.length === 0) {
-          console.log('No transactions in the latest block.');
-          await sendTelegramNotification('No transactions in the latest block.');
-          return;
-      }
+        if (!transactions || transactions.length === 0) {
+            console.log('No transactions in the latest block.');
+            await sendTelegramNotification('No transactions in the latest block.');
+            return;
+        }
 
-      let depositFound = false;
-      transactions.forEach(tx => {
-          if (tx.to && tx.to.toLowerCase() === BEACON_DEPOSIT_CONTRACT.toLowerCase()) {
-              winston.info(`New deposit detected: ${tx.hash}`);
-              console.log("Deposit Details: ", tx);
-              depositFound = true;
-              sendTelegramNotification(`New deposit detected: ${tx.hash}\nDetails: ${JSON.stringify(tx)}`);
-          }
-      });
+        let depositFound = false;
+        transactions.forEach(tx => {
+            if (tx.to && tx.to.toLowerCase() === BEACON_DEPOSIT_CONTRACT.toLowerCase()) {
+                winston.info(`New deposit detected: ${tx.hash}`);
+                console.log("Deposit Details: ", tx);
+                depositFound = true;
+                sendTelegramNotification(`New deposit detected: ${tx.hash}\nDetails: ${JSON.stringify(tx)}`);
+            }
+        });
 
-      if (!depositFound) {
-          console.log('No deposits to the specified contract in the latest block.');
-      }
-  } catch (error) {
-      winston.error("Error tracking deposits:", error);
-      console.error('Error in tracking deposits:', error);
-      await sendTelegramNotification('Error tracking deposits: ' + error.message);
-  }
+        if (!depositFound) {
+            console.log('No deposits to the specified contract in the latest block.');
+        }
+    } catch (error) {
+        winston.error("Error tracking deposits:", error);
+        console.error('Error in tracking deposits:', error);
+        await sendTelegramNotification('Error tracking deposits: ' + error.message);
+    }
 }
 
 // Temporarily trigger a notification
 (async () => {
-  await sendTelegramNotification('This is a test notification.');
+    await sendTelegramNotification('This is a test notification.');
 })();
 
 
